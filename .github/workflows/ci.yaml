@@ -1,0 +1,16 @@
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: coursier/cache-action@v6
+      - uses: coursier/setup-action@v1
+      - run: echo cs-version=${{ steps.cs-setup.outputs.cs-version }}
+      - run: java -version
+      - run: cs java -version
+      - name: Run test
+        run: sbt test
