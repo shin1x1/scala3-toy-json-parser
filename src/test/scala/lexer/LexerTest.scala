@@ -5,7 +5,7 @@ import org.junit.Test
 
 class LexerTest:
   @Test def getNextToken(): Unit =
-    val scanner = Scanner("[]{}:,-123.32,12345e-3\"\\u3042a\\\"\"true,false,null")
+    val scanner = Scanner("""[]{}:,-123.32,12345e-3"\u3042a\""true,false,null""")
 
     assertEquals(Right(Token.LeftBrace), Lexer.getNextToken(scanner))
     assertEquals(Right(Token.RightBrace), Lexer.getNextToken(scanner))
@@ -24,7 +24,7 @@ class LexerTest:
     assertEquals(Right(Token.Null), Lexer.getNextToken(scanner))
 
   @Test def getNextToken_Unterminated_string(): Unit =
-    val scanner = Scanner("\"a")
+    val scanner = Scanner(""""a""")
 
     assertTrue(Lexer.getNextToken(scanner).isLeft)
 

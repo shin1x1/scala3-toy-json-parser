@@ -21,6 +21,7 @@ type EitherToken = Either[Exception, Token]
 
 object Lexer:
   def getNextToken(scanner: Scanner): EitherToken = scanner.consume() match
+    case Some(c) if c == ' ' || c == '\r' || c == '\n' || c == '\t' => getNextToken(scanner)
     case Some(c) => lex(c)(using scanner)
     case None => Left(IndexOutOfBoundsException())
 
