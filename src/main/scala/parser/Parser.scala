@@ -41,25 +41,18 @@ object Parser:
       val token = Lexer.getNextToken(scanner).getOrElse(return None)
 
       state match
-        case Default => {
-          token match
-            case Token.RightBrace => return Some(list)
-            case _ => {
-              val v = parseValue(token).getOrElse(return None)
-              parse(Value, list.appended(v))
-            }
-        }
-        case Value => {
-          token match
-            case Token.RightBrace => return Some(list)
-            case Token.Comma => parse(Comma, list)
-            case _ => return None
-        }
-        case Comma => {
-          val v = parseValue(token).getOrElse(return None)
-
-          parse(Value, list.appended(v))
-        }
+        case Default => token match
+          case Token.RightBrace => Some(list)
+          case _ => parseValue(token) match
+            case Right(v) => parse(Value, list :+ v)
+            case Left(_) => None
+        case Value => token match
+          case Token.RightBrace => Some(list)
+          case Token.Comma => parse(Comma, list)
+          case _ => None
+        case Comma => parseValue(token) match
+          case Right(v) => parse(Value, list :+ v)
+          case Left(_) => None
 
     parse(Default, List()) match
       case Some(l) => Right(JsonValue.Array(l))
