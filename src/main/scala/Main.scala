@@ -1,5 +1,14 @@
-@main def hello: Unit =
-  println("Hello world!")
-  println(msg)
+import lexer.Scanner
+import parser.Parser
+import scala.io.StdIn
 
-def msg = "I was compiled by Scala 3. :)"
+@main def main: Unit =
+  def readAllText(): String =
+    StdIn.readLine() match
+      case null => ""
+      case s => s + readAllText()
+
+  val json = readAllText()
+  val scanner = Scanner(json)
+
+  println(Parser.parse(scanner))
