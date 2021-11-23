@@ -1,8 +1,22 @@
-## sbt project compiled with Scala 3
+# Scala 3 toy json parser
 
-### Usage
+A toy json parser implementation in Scala 3.
 
-This is a normal sbt project. You can compile code with `sbt compile`, run it with `sbt run`, and `sbt console` will start a Scala 3 REPL.
+## Usage
 
-For more information on the sbt-dotty plugin, see the
-[scala3-example-project](https://github.com/scala/scala3-example-project/blob/main/README.md).
+* Read from stdin
+
+```shell
+$ echo '{"a":100,"b":[true,"hello",23e10]}' |  scala3 target/scala-3.1.0/toy-json-parser-with-scala-3_3-0.1.0-SNAPSHOT.jar
+Success(Object(Map(a -> Number(100.0), b -> Array(List(True, String(hello), Number(2.3E11))))))
+```
+
+* Read from JSON File
+
+```shell
+$ cat json
+{"a":100,"b":[true,"hello",23e10]}
+
+$ scala3 target/scala-3.1.0/toy-json-parser-with-scala-3_3-0.1.0-SNAPSHOT.jar json
+Success(Object(Map(a -> Number(100.0), b -> Array(List(True, String(hello), Number(2.3E11))))))
+```
