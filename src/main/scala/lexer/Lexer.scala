@@ -26,10 +26,10 @@ object Lexer:
     case None => Failure(IndexOutOfBoundsException())
 
   private def lex(char: Char)(using Scanner): TryToken = char match
-    case '[' => Success(Token.LeftBrace)
-    case ']' => Success(Token.RightBrace)
-    case '{' => Success(Token.LeftBracket)
-    case '}' => Success(Token.RightBracket)
+    case '[' => Success(Token.LeftBracket)
+    case ']' => Success(Token.RightBracket)
+    case '{' => Success(Token.LeftBrace)
+    case '}' => Success(Token.RightBrace)
     case ':' => Success(Token.Colon)
     case ',' => Success(Token.Comma)
     case '-' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => lexNumber(char)

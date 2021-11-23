@@ -9,10 +9,10 @@ class LexerTest:
   @Test def getNextToken(): Unit =
     val scanner = Scanner("""[]{}:,-123.32,12345e-3"\u3042a\""true,false,null""")
 
-    assertEquals(Success(Token.LeftBrace), Lexer.getNextToken(scanner))
-    assertEquals(Success(Token.RightBrace), Lexer.getNextToken(scanner))
     assertEquals(Success(Token.LeftBracket), Lexer.getNextToken(scanner))
     assertEquals(Success(Token.RightBracket), Lexer.getNextToken(scanner))
+    assertEquals(Success(Token.LeftBrace), Lexer.getNextToken(scanner))
+    assertEquals(Success(Token.RightBrace), Lexer.getNextToken(scanner))
     assertEquals(Success(Token.Colon), Lexer.getNextToken(scanner))
     assertEquals(Success(Token.Comma), Lexer.getNextToken(scanner))
     assertEquals(Success(Token.Number(-123.32)), Lexer.getNextToken(scanner))

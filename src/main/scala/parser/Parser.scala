@@ -30,8 +30,8 @@ object Parser:
     case Token.Null => Success(JsonValue.Null)
     case Token.True => Success(JsonValue.True)
     case Token.False => Success(JsonValue.False)
-    case Token.LeftBrace => parseArray()
-    case Token.LeftBracket => parseObject()
+    case Token.LeftBracket => parseArray()
+    case Token.LeftBrace => parseObject()
     case x => Failure(Exception(s"Unexpected Token: $x"))
 
   private def parseArray()(using scanner: Scanner): TryJsonValue =
@@ -46,12 +46,12 @@ object Parser:
 
       state match
         case Default => token match
-          case Token.RightBrace => Some(list)
+          case Token.RightBracket => Some(list)
           case _ => parseValue(token) match
             case Success(v) => parse(Value, list :+ v)
             case Failure(_) => None
         case Value => token match
-          case Token.RightBrace => Some(list)
+          case Token.RightBracket => Some(list)
           case Token.Comma => parse(Comma, list)
           case _ => None
         case Comma => parseValue(token) match
@@ -74,7 +74,7 @@ object Parser:
 
       state match
         case Default => token match
-          case Token.RightBracket => Some(map)
+          case Token.RightBrace => Some(map)
           case Token.String(s) => parse(Key, map, Some(s))
           case _ => None
         case Key => token match
@@ -87,11 +87,11 @@ object Parser:
             case Failure(_) => None
         }
         case Value => token match
-          case Token.RightBracket => Some(map)
+          case Token.RightBrace => Some(map)
           case Token.Comma => parse(Comma, map, None)
           case _ => None
         case Comma => token match
-          case Token.RightBracket => Some(map)
+          case Token.RightBrace => Some(map)
           case Token.String(s) => parse(Key, map, Some(s))
           case _ => None
 
