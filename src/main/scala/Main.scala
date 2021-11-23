@@ -1,14 +1,13 @@
 import lexer.Scanner
 import parser.Parser
-import scala.io.StdIn
 
-@main def main: Unit =
-  def readAllText(): String =
-    StdIn.readLine() match
-      case null => ""
-      case s => s + readAllText()
+import java.io.FileInputStream
+import scala.io.{Source, StdIn}
 
-  val json = readAllText()
-  val scanner = Scanner(json)
+object Main:
+  def main(args: Array[String]): Unit =
+    val input = args.length match
+      case 1 => System.in
+      case _ => FileInputStream(args(1))
 
-  println(Parser.parse(scanner))
+    println(Parser.parse(Scanner(input)))

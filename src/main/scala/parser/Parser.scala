@@ -1,6 +1,9 @@
 package parser
 
-import lexer.{Scanner, Token, Lexer}
+import lexer.{Lexer, Scanner, Token}
+
+import scala.annotation.tailrec
+import scala.util.{Failure, Success, Try}
 
 enum JsonValue:
   case Number(value: Double)
@@ -11,32 +14,33 @@ enum JsonValue:
   case Array(value: List[JsonValue])
   case Object(value: Map[scala.Predef.String, JsonValue])
 
-type EitherJsonValue = Either[String, JsonValue]
+type TryJsonValue = Try[JsonValue]
 
 object Parser:
-  def parse(scanner: Scanner): EitherJsonValue =
-    if scanner.isEot() then return Right(JsonValue.Null)
+  def parse(scanner: Scanner): TryJsonValue =
+    if scanner.isEot() then return Success(JsonValue.Null)
 
     Lexer.getNextToken(scanner) match
-      case Right(t) => parseValue(t)(using scanner)
-      case Left(e) => Left(e.toString)
+      case Success(t) => parseValue(t)(using scanner)
+      case Failure(e) => Failure(e)
 
-  private def parseValue(token: Token)(using scanner: Scanner): EitherJsonValue = token match
-    case Token.Number(v) => Right(JsonValue.Number(v))
-    case Token.String(v) => Right(JsonValue.String(v))
-    case Token.Null => Right(JsonValue.Null)
-    case Token.True => Right(JsonValue.True)
-    case Token.False => Right(JsonValue.False)
+  private def parseValue(token: Token)(using scanner: Scanner): TryJsonValue = token match
+    case Token.Number(v) => Success(JsonValue.Number(v))
+    case Token.String(v) => Success(JsonValue.String(v))
+    case Token.Null => Success(JsonValue.Null)
+    case Token.True => Success(JsonValue.True)
+    case Token.False => Success(JsonValue.False)
     case Token.LeftBrace => parseArray()
     case Token.LeftBracket => parseObject()
-    case x => Left(s"Unexpected Token: $x")
+    case x => Failure(Exception(s"Unexpected Token: $x"))
 
-  private def parseArray()(using scanner: Scanner): EitherJsonValue =
+  private def parseArray()(using scanner: Scanner): TryJsonValue =
     enum State:
       case Default, Value, Comma
 
     import State.*
 
+    @tailrec
     def parse(state: State, list: List[JsonValue]): Option[List[JsonValue]] =
       val token = Lexer.getNextToken(scanner).getOrElse(return None)
 
@@ -44,26 +48,27 @@ object Parser:
         case Default => token match
           case Token.RightBrace => Some(list)
           case _ => parseValue(token) match
-            case Right(v) => parse(Value, list :+ v)
-            case Left(_) => None
+            case Success(v) => parse(Value, list :+ v)
+            case Failure(_) => None
         case Value => token match
           case Token.RightBrace => Some(list)
           case Token.Comma => parse(Comma, list)
           case _ => None
         case Comma => parseValue(token) match
-          case Right(v) => parse(Value, list :+ v)
-          case Left(_) => None
+          case Success(v) => parse(Value, list :+ v)
+          case Failure(_) => None
 
     parse(Default, List()) match
-      case Some(l) => Right(JsonValue.Array(l))
-      case None => Left("Invalid array")
+      case Some(l) => Success(JsonValue.Array(l))
+      case None => Failure(Exception("Invalid array"))
 
-  private def parseObject()(using scanner: Scanner): EitherJsonValue =
+  private def parseObject()(using scanner: Scanner): TryJsonValue =
     enum State:
       case Default, Value, Comma, Colon, Key
 
     import State.*
 
+    @tailrec
     def parse(state: State, map: Map[String, JsonValue], key: Option[String]): Option[Map[String, JsonValue]] =
       val token = Lexer.getNextToken(scanner).getOrElse(return None)
 
@@ -78,18 +83,18 @@ object Parser:
         case Colon => {
           val keyString = key.getOrElse(return None)
           parseValue(token) match
-            case Right(v) => parse(Value, map + (keyString -> v), None)
-            case Left(_) => None
+            case Success(v) => parse(Value, map + (keyString -> v), None)
+            case Failure(_) => None
         }
         case Value => token match
           case Token.RightBracket => Some(map)
           case Token.Comma => parse(Comma, map, None)
           case _ => None
         case Comma => token match
-          case Token.RightBracket => return Some(map)
+          case Token.RightBracket => Some(map)
           case Token.String(s) => parse(Key, map, Some(s))
           case _ => None
 
     parse(Default, Map(), None) match
-      case Some(l) => Right(JsonValue.Object(l))
-      case None => Left("Invalid object")
+      case Some(l) => Success(JsonValue.Object(l))
+      case None => Failure(Exception("Invalid object"))

@@ -22,3 +22,8 @@ class ScannerTest:
     assertTrue(sut.isEot())
     assertEquals(None, sut.peek())
     assertEquals(None, sut.consume())
+
+  @Test def isEot(): Unit =
+    val sut = Scanner("")
+
+    assertTrue(sut.isEot())
