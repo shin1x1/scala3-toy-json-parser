@@ -8,7 +8,7 @@ import scala.util.Success
 
 class ParserTest:
   @Test def parse(): Unit =
-    val scanner = Scanner("""[null,true,false,[123,"abc",-23.2],{"name": {"no":10e2}}]""")
+    val scanner = Scanner("""[null,true,false,[0,"あabc",-23.2],{"name": {"no":10e2}}]""")
 
     val array = List(
       JsonValue.Null,
@@ -16,8 +16,8 @@ class ParserTest:
       JsonValue.False,
       JsonValue.Array(
         List(
-          JsonValue.Number(123.0),
-          JsonValue.String("abc"),
+          JsonValue.Number(0.0),
+          JsonValue.String("あabc"),
           JsonValue.Number(-23.2),
         )
       ),

@@ -32,7 +32,7 @@ object Lexer:
     case '}' => Success(Token.RightBrace)
     case ':' => Success(Token.Colon)
     case ',' => Success(Token.Comma)
-    case '-' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => lexNumber(char)
+    case '-' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => lexNumber(char)
     case '"' => lexString(char)
     case 't' => lexLiteral("true", Token.True)
     case 'f' => lexLiteral("false", Token.False)
